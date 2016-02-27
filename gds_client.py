@@ -8,7 +8,7 @@ class DatastoreClient:
         self.service = build("datastore", "v1beta2",
                              credentials=self.credentials)
 
-    def beginTransaction(self, datasetId, isolationLevel):
+    def beginTransaction(self, datasetId, isolationLevel="snapshot"):
         """Begin a new transaction
 
         Arguments:
@@ -20,7 +20,7 @@ class DatastoreClient:
             dict -- Containing header and transaction identifier
         """
         body = {
-            "isolationLevel": "snapshot"
+            "isolationLevel": isolationLevel
         }
 
         return self.service.datasets.beginTransaction(datasetId=datasetId,
