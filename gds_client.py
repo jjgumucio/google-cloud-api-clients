@@ -26,17 +26,23 @@ class DatastoreClient:
         return self.service.datasets.beginTransaction(datasetId=datasetId,
                                                       body=body).execute()
 
-    def commit(self, datasetId, action):
+    def commit(self, datasetId, trasactionId, mutation):
         """Commit a transaction, optionally creating, deleting or modifying
             some entities.
 
         Arguments:
             datasetId {str} -- Identifies the dataset
-            action {str} -- Action to take (insert, update, delete, upsert)
+            transactionId {str} -- Id returned from a call to beginTransaction
+            mutation {dict} -- A set of changes to apply
+
+            ref: https://developers.google.com/resources/api-libraries/documentation/datastore/v1beta2/python/latest/datastore_v1beta2.datasets.html#commit
         """
 
         body = {
-
+            "ignoreReadOnly": "True",
+            "trasaction": trasactionId,
+            "mode": "TRASACTIONAL",
+            "mutation": mutation
         }
 
         return self.service.datasets().commit(
