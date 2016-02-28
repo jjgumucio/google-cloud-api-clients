@@ -23,10 +23,10 @@ class DatastoreClient:
             "isolationLevel": isolationLevel
         }
 
-        return self.service.datasets.beginTransaction(datasetId=datasetId,
-                                                      body=body).execute()
+        return self.service.datasets().beginTransaction(datasetId=datasetId,
+                                                        body=body).execute()
 
-    def commit(self, datasetId, trasactionId, mutation):
+    def commit(self, datasetId, transactionId, mutation):
         """Commit a transaction, optionally creating, deleting or modifying
             some entities.
 
@@ -40,7 +40,7 @@ class DatastoreClient:
 
         body = {
             "ignoreReadOnly": "True",
-            "trasaction": trasactionId,
+            "transaction": transactionId,
             "mode": "TRASACTIONAL",
             "mutation": mutation
         }
