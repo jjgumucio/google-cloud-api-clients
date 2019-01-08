@@ -1,5 +1,6 @@
 from oauth2client.client import GoogleCredentials
 from googleapiclient.discovery import build
+import json
 
 
 class ComputeEngineClient:
@@ -8,6 +9,56 @@ class ComputeEngineClient:
         self.ZONE = zone
         self.credentials = GoogleCredentials.get_application_default()
         self.service = build('compute', 'v1', credentials=self.credentials)
+
+    def get_instance(self, instance):
+        """Gets intance resource
+
+        Arguments:
+            instance {string} -- Name of the instance
+        Returns:
+            dict -- All the instance data
+        """
+
+        return self.service.instances().get(project=self.PROJECT, zone=self.ZONE, instance=instance).execute()
+
+    def get_instance_fingerprint(self, instance):
+        """Gets intance fingerprint
+
+        Arguments:
+            instance {string} -- Name of the instance
+        Returns:
+            string -- The instance current fingerprint
+        """
+
+        instance_data = self.get_instance(instance)
+        return instance_data['metadata']['fingerprint']
+
+    def set_instance_startup_script(self, instance, path):
+        """Sets intance startup script
+
+        Arguments:
+            instance {string} -- Name of the instance
+            path {string} -- Path to the startup script
+        """
+
+        fingerprint = self.get_instance_fingerprint(instance)
+        print(f"fingerprint: {fingerprint}")
+        script_file = ''
+        with open(path, 'r') as ss:
+            script_file = ss.read()
+
+        body = {
+            "kind": "compute#metadata",
+            "fingerprint": fingerprint,
+            "items": [
+                {
+                "key": "startup-script",
+                "value": script_file
+                }
+            ]
+        }
+        self.service.instances().setMetadata(project=self.PROJECT, zone=self.ZONE, instance=instance, body=json.dumps(body)).execute()
+
 
     # -- [START] Managed instance group --
     def create_instance_template(self, name, image, acc_email, machine_type="n1-standard-1", sScript_url=""):
